@@ -6,8 +6,8 @@ let bird = {
     y: 200,
     width: 30,
     height: 30,
-    gravity: 0.4,
-    lift: -8,
+    gravity: 0.2,   // Reduced gravity
+    lift: -5,       // Smooth jump
     velocity: 0
 };
 
@@ -25,7 +25,7 @@ function drawBird() {
 }
 
 function createPipe() {
-    let gap = 140 - (level * 5);
+    let gap = 150 - (level * 5);
     let topHeight = Math.random() * 250 + 50;
 
     pipes.push({
@@ -46,10 +46,11 @@ function drawPipes() {
 
 function updatePipes() {
     pipes.forEach(pipe => {
-        pipe.x -= 2 + level;
+        pipe.x -= 2 + (level * 0.3);
 
-        // Score increase
-        if (pipe.x + pipe.width === bird.x) {
+        // Score update
+        if (pipe.x + pipe.width < bird.x && !pipe.passed) {
+            pipe.passed = true;
             score++;
             document.getElementById("score").innerText = score;
 
@@ -59,7 +60,7 @@ function updatePipes() {
             }
         }
 
-        // Collision
+        // Collision check
         if (
             bird.x < pipe.x + pipe.width &&
             bird.x + bird.width > pipe.x &&
@@ -85,10 +86,14 @@ function endGame() {
     gameOver = true;
 
     if (score > highScore) {
-        localStorage.setItem("highScore", score);
+        highScore = score;
+        localStorage.setItem("highScore", highScore);
+        document.getElementById("highScore").innerText = highScore;
     }
 
-    alert("Game Over! Score: " + score);
+    setTimeout(() => {
+        alert("Game Over! Score: " + score);
+    }, 100);
 }
 
 function gameLoop() {
@@ -138,4 +143,4 @@ setInterval(function () {
     if (!gameOver) {
         createPipe();
     }
-}, 1500);
+}, 1600);
